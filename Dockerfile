@@ -1,13 +1,15 @@
-# Étape 1 : Build de l'application Angular
-FROM node:18 AS build
-WORKDIR /app
-COPY package.json package-lock.json ./
-RUN npm install
-COPY . .
-RUN npm run build --prod
 
-# Étape 2 : Servir l’application avec Nginx
-FROM nginx:alpine
-COPY --from=build /app/dist /usr/share/nginx/html
-EXPOSE 80
-CMD ["nginx", "-g", "daemon off;"]
+# Utiliser une image Java officielle comme base
+FROM openjdk:17-jdk-slim
+
+# Définir le répertoire de travail
+WORKDIR /app
+
+# Copier le fichier JAR généré par Maven dans le conteneur
+COPY target/*.jar app.jar
+
+# Exposer le port utilisé par l'application
+EXPOSE 8080
+
+# Commande pour exécuter l'application
+ENTRYPOINT ["java", "-jar", "app.jar"]
